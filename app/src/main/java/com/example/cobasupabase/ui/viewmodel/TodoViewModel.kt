@@ -4,7 +4,7 @@ package com.example.cobasupabase.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cobasupabase.domain.model.Todo
-import com.example.cobasupabase.domain.repositories.TodoRepository
+import com.example.cobasupabase.data.repositories.TodoRepository
 import com.example.cobasupabase.ui.common.UiResult
 
 import kotlinx.coroutines.flow.MutableStateFlow

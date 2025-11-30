@@ -24,7 +24,6 @@ import com.example.cobasupabase.ui.viewmodel.TodoViewModel
 @Composable
 fun HomeScreen(
     todoViewModel: TodoViewModel = viewModel(),
-    authViewModel: AuthViewModel = viewModel(),
     onAdd: () -> Unit,
     onDetail: (String) -> Unit,
     onLogout: () -> Unit
@@ -41,7 +40,6 @@ fun HomeScreen(
                 title = { Text("Todos") },
                 actions = {
                     IconButton(onClick = {
-                        authViewModel.logout()
                         onLogout()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")

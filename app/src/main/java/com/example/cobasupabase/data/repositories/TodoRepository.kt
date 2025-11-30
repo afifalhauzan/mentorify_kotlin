@@ -1,8 +1,9 @@
-package com.example.cobasupabase.domain.repositories
+package com.example.cobasupabase.data.repositories
 
 
 
 
+import android.util.Log
 import com.example.cobasupabase.data.remote.SupabaseHolder
 import com.example.cobasupabase.domain.mapper.TodoMapper
 import com.example.cobasupabase.domain.model.Todo
@@ -102,7 +103,7 @@ class TodoRepository {
             filter { eq("id", id) }
             // JANGAN pakai single() di sini
         }
-        android.util.Log.d("GET_TODO", "raw=" + (response.data ?: "null"))
+        Log.d("GET_TODO", "raw=" + (response.data ?: "null"))
         val dto = response.decodeList<TodoDto>().firstOrNull() ?: return null
         return TodoMapper.map(dto, ::resolveImageUrl)
     }
