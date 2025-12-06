@@ -54,6 +54,7 @@ fun HomeScreen(
         }
     ) { padding ->
         when (todosState) {
+            is UiResult.Idle -> {}
             is UiResult.Loading -> Box(Modifier.padding(padding)) { CircularProgressIndicator() }
             is UiResult.Error -> Text(
                 (todosState as UiResult.Error).message,
