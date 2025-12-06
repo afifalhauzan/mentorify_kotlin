@@ -8,20 +8,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Scaffold // Import Scaffold
+import androidx.compose.material3.FloatingActionButton // Import FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -34,7 +37,7 @@ import com.example.cobasupabase.ui.nav.Routes
 @Composable
 fun BerandaScreen(
     todoViewModel: TodoViewModel = viewModel(),
-    navController: NavHostController // Add NavHostController for navigation to DetailScreen
+    navController: NavHostController,
 ) {
     val todosState by todoViewModel.todos.collectAsState()
 
@@ -42,23 +45,33 @@ fun BerandaScreen(
         todoViewModel.loadTodos()
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            when (todosState) {
-                is UiResult.Loading -> CircularProgressIndicator()
-                is UiResult.Error -> Text(
-                    (todosState as UiResult.Error).message,
-                    modifier = Modifier.padding(16.dp)
-                )
-                is UiResult.Success -> TodoList(
-                    list = (todosState as UiResult.Success<List<Todo>>).data,
-                    onDelete = { todoViewModel.deleteTodo(it) },
-                    onDetail = { id -> navController.navigate(Routes.Detail.replace("{id}", id)) }, // Corrected navigation
-                    modifier = Modifier.fillMaxSize()
-                )
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate(Routes.AddTodo)}) { // Use onAdd lambda here
+                Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        }
+    ) { paddingValues -> // Use paddingValues from Scaffold
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues), // Apply padding from Scaffold
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                when (todosState) {
+                    is UiResult.Loading -> CircularProgressIndicator()
+                    is UiResult.Error -> Text(
+                        (todosState as UiResult.Error).message,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    is UiResult.Success -> TodoList(
+                        list = (todosState as UiResult.Success<List<Todo>>).data,
+                        onDelete = { todoViewModel.deleteTodo(it) },
+                        onDetail = { id -> navController.navigate(Routes.Detail.replace("{id}", id)) }, // Corrected navigation
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }

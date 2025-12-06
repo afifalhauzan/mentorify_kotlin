@@ -3,6 +3,7 @@ package com.example.cobasupabase.ui.pages
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -29,7 +30,7 @@ import com.example.cobasupabase.ui.pages.ProfilScreen
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Beranda : BottomNavItem(Routes.Beranda, Icons.Default.Home, "Beranda")
     object Cari : BottomNavItem(Routes.Cari, Icons.Default.Search, "Cari")
-    object Berita : BottomNavItem(Routes.Berita, Icons.Default.Home, "Berita") // Note: Using Icons.Default.Home, consider changing if a more appropriate icon exists
+    object Berita : BottomNavItem(Routes.Berita, Icons.Default.Info, "Berita") // Note: Using Icons.Default.Home, consider changing if a more appropriate icon exists
     object Profil : BottomNavItem(Routes.Profil, Icons.Default.Person, "Profil")
 }
 

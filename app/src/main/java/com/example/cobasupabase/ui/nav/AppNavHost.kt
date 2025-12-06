@@ -15,6 +15,7 @@ import com.example.cobasupabase.ui.pages.MainHomeScreen
 import com.example.cobasupabase.ui.viewmodel.AuthViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text // For OnboardingScreenPlaceholder
+import com.example.cobasupabase.ui.pages.AddTodoScreen // Import AddTodoScreen
 import com.example.cobasupabase.ui.pages.DetailScreen // Import DetailScreen
 
 object Graph {
@@ -29,7 +30,8 @@ object Routes {
     const val Login = "login_route"
     const val Register = "register_route"
     const val Home = "home_route"
-    const val Detail = "detail_route/{id}" // Added Detail route
+    const val AddTodo = "addtodo_route" // Changed route name to match navigation call
+    const val Detail = "detail_route/{id}"
     const val Beranda = "beranda_route"
     const val Cari = "cari_route"
     const val Berita = "berita_route"
@@ -91,7 +93,11 @@ fun AppNavigation(
             MainHomeScreen(navController = navController) // Pass the root navController
         }
 
-        composable(Routes.Detail) { backStackEntry -> // Added Detail composable
+        composable(Routes.AddTodo) { // Added AddTodoScreen composable
+            AddTodoScreen(onDone = { navController.popBackStack() })
+        }
+
+        composable(Routes.Detail) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             DetailScreen(id = id, onBack = { navController.popBackStack() })
         }
