@@ -29,7 +29,7 @@ class TodoRepository {
 
     suspend fun fetchTodos(): List<Todo> {
         val userId = SupabaseHolder.session()?.user?.id ?: return emptyList()
-        val response = postgrest["todos_a"].select {
+        val response = postgrest["todos"].select {
             filter {
                 eq("user_id", userId)
             }
@@ -54,7 +54,7 @@ class TodoRepository {
             imagePath = uploadImage(imageFile, userId)
         }
 
-        val insert = postgrest["todos_a"].insert(
+        val insert = postgrest["todos"].insert(
             mapOf(
                 "user_id" to userId,
                 "title" to title,
@@ -81,7 +81,7 @@ class TodoRepository {
     }
 
     suspend fun deleteTodo(id: String) {
-        postgrest["todos_a"].delete {
+        postgrest["todos"].delete {
             filter { eq("id", id) }
         }
     }
@@ -89,7 +89,7 @@ class TodoRepository {
 
 
 //    suspend fun getTodo(id: String): Todo? {
-//        val response = postgrest["todos_a"].select {
+//        val response = postgrest["todos"].select {
 //            filter { eq("id", id) }
 //            single()
 //        }
@@ -99,7 +99,7 @@ class TodoRepository {
 //    }
 
     suspend fun getTodo(id: String): Todo? {
-        val response = postgrest["todos_a"].select {
+        val response = postgrest["todos"].select {
             filter { eq("id", id) }
             // JANGAN pakai single() di sini
         }
