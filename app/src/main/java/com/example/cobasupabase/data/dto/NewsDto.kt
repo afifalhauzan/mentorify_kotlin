@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NewsDto(
-    val id: Int,
-    @SerialName("user_id") val userId: String,
-    @SerialName("created_at") val createdAt: String,
+    val id: Int? = null,
+    @SerialName("user_id") val userId: String? = null,
+    @SerialName("created_at") val createdAt: String? = null,
     val title: String,
     val content: String,
     val author: String,
