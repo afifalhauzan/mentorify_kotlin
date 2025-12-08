@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.cobasupabase.ui.nav.Routes
+import com.example.cobasupabase.ui.pages.DetailBeritaScreen
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Beranda : BottomNavItem(Routes.Beranda, Icons.Default.Home, "Beranda")
@@ -80,7 +81,12 @@ fun MainHomeScreen(navController: NavHostController) {
                 )
             }
             composable(Routes.Cari) { CariScreen(navController = bottomNavController) } // CORRECTED: Pass bottomNavController
-            composable(Routes.Berita) { BeritaScreen() }
+            composable(Routes.Berita) {  BeritaScreen( navController = bottomNavController) }
+            composable(Routes.BeritaDetail) { backStackEntry ->
+                DetailBeritaScreen(
+                    onBack = { bottomNavController.popBackStack() }
+                )
+            }
             composable(Routes.Profil) { ProfilScreen() }
             composable(Routes.TeacherDetail) { backStackEntry ->
                 val teacherId = backStackEntry.arguments?.getString("teacherId") ?: ""

@@ -41,7 +41,10 @@ object Routes {
     const val Tempat = "tempat_route" // New route
     const val Review = "review_route" // New route
 
+    const val BeritaDetail = "news_detail/{newsId}"
+
     fun buildTeacherDetailRoute(teacherId: String) = "teacher_detail_route/$teacherId" // Helper function
+    fun buildBeritaDetailRoute(newsId: Int) = "news_detail/$newsId"
 }
 
 @Composable

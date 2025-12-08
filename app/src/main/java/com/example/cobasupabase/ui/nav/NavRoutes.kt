@@ -14,4 +14,9 @@ sealed class Screen(val route: String) {
     object Tempat : Screen("tempat")
     object Berita : Screen("berita")
     object Profil : Screen("profil")
+
+
+    object BeritaDetail : Screen("news_detail/{newsId}") {
+        fun build(newsId: Int) = "news_detail/$newsId"
+    }
 }
