@@ -11,6 +11,6 @@ data class NewsDto(
     val title: String,
     val content: String,
     val author: String,
-    @SerialName("date_published") val datePublished: String?, // Tetap String dari DB
+    @SerialName("date_published") val datePublished: String?,
     @SerialName("image_url") val imageUrl: String?
 )
