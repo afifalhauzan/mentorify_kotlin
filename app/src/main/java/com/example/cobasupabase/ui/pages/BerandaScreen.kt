@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -48,12 +49,14 @@ import com.example.cobasupabase.ui.viewmodel.AuthViewModel
 import com.example.cobasupabase.ui.viewmodel.TodoViewModel
 import com.example.cobasupabase.ui.components.TeacherCard
 import com.example.cobasupabase.ui.viewmodel.TeacherViewModel
-
+import com.example.cobasupabase.ui.viewmodel.NewsViewModel
+import com.example.cobasupabase.ui.components.HomeNewsItem
 @Composable
 fun BerandaScreen(
     todoViewModel: TodoViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel(),
     teacherViewModel: TeacherViewModel = viewModel(),
+    newsViewModel: NewsViewModel = viewModel(),
     navController: NavHostController,
     onNavigateToCari: () -> Unit,
     onNavigateToJadwal: () -> Unit,
@@ -65,9 +68,11 @@ fun BerandaScreen(
     val todosState by todoViewModel.todos.collectAsState()
     val currentUserEmail by authViewModel.currentUserEmail.collectAsState()
     val teacherUiState by teacherViewModel.uiState.collectAsState()
+    val newsState by newsViewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         todoViewModel.loadTodos()
+        newsViewModel.fetchNews()
     }
 
     Scaffold(
@@ -206,6 +211,39 @@ fun BerandaScreen(
                         Text("Berita Populer", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
                         TextButton(onClick = onNavigateToBerita) { Text("Lainnya") }
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    when (val state = newsState) {
+                        is UiResult.Loading -> {
+                            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            }
+                        }
+                        is UiResult.Error -> {
+                            Text("Gagal memuat berita", color = Color.Red, style = MaterialTheme.typography.labelSmall)
+                        }
+                        is UiResult.Success -> {
+                            val topNews = state.data.take(2)
+
+                            if (topNews.isEmpty()) {
+                                Text("Belum ada berita.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                            } else {
+                                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                    topNews.forEach { news ->
+                                        HomeNewsItem(
+                                            news = news,
+                                            onClick = { newsId ->
+                                                navController.navigate(Routes.buildBeritaDetailRoute(newsId))
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        else -> {}
+                    }
+
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }

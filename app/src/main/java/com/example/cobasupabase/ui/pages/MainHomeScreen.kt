@@ -21,7 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.cobasupabase.ui.nav.Routes
-import com.example.cobasupabase.ui.pages.DetailBeritaScreen
+import com.example.cobasupabase.ui.pages.AddNewsScreen
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Beranda : BottomNavItem(Routes.Beranda, Icons.Default.Home, "Beranda")
@@ -69,7 +69,7 @@ fun MainHomeScreen(navController: NavHostController) {
         NavHost(bottomNavController, startDestination = BottomNavItem.Beranda.route, Modifier.padding(paddingValues)) {
             composable(Routes.Beranda) {
                 BerandaScreen(
-                    navController = navController, // Root controller for AddTodo, etc.
+                    navController = bottomNavController, // Root controller for AddTodo, etc.
                     onNavigateToCari = { bottomNavController.navigate(Routes.Cari) },
                     onNavigateToJadwal = { bottomNavController.navigate(Routes.Jadwal) },
                     onNavigateToTempat = { bottomNavController.navigate(Routes.Tempat) },
@@ -84,6 +84,17 @@ fun MainHomeScreen(navController: NavHostController) {
             composable(Routes.Berita) {  BeritaScreen( navController = bottomNavController) }
             composable(Routes.BeritaDetail) { backStackEntry ->
                 DetailBeritaScreen(
+                    onBack = { bottomNavController.popBackStack() },
+                    onNavigateToEdit = { newsId -> bottomNavController.navigate(Routes.buildBeritaEditRoute(newsId))}
+                )
+            }
+            composable(Routes.BeritaEdit) { backStackEntry ->
+                EditBeritaScreen(
+                    onBack = { bottomNavController.popBackStack() }
+                )
+            }
+            composable(Routes.AddNews) {
+                AddNewsScreen(
                     onBack = { bottomNavController.popBackStack() }
                 )
             }

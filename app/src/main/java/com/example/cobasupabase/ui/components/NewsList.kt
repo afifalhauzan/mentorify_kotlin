@@ -100,7 +100,7 @@ fun NewsList(news: News, modifier: Modifier = Modifier, onClick: (Int) -> Unit) 
 
                     if (news.author != null) {
                         Text(
-                            text = " • Oleh: ${news.author}",
+                            text = " • ${news.datePublished}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,

@@ -1,35 +1,21 @@
 package com.example.cobasupabase.ui.pages
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,9 +27,52 @@ import com.example.cobasupabase.ui.viewmodel.NewsDetailViewModel
 @Composable
 fun DetailBeritaScreen(
     onBack: () -> Unit,
+    onNavigateToEdit: (Int) -> Unit,
     viewModel: NewsDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val deleteState by viewModel.deleteUiState.collectAsState()
+
+    val context = LocalContext.current
+
+    // State untuk Dialog Konfirmasi Hapus
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchNewsDetail()
+    }
+    // Efek Samping: Memantau status penghapusan
+    LaunchedEffect(deleteState) {
+        if (deleteState is UiResult.Success) {
+            Toast.makeText(context, "Berita berhasil dihapus", Toast.LENGTH_SHORT).show()
+            viewModel.resetDeleteState()
+            onBack() // Kembali ke list setelah hapus
+        } else if (deleteState is UiResult.Error) {
+            Toast.makeText(context, (deleteState as UiResult.Error).message, Toast.LENGTH_SHORT).show()
+            viewModel.resetDeleteState()
+        }
+    }
+
+    // Modal Konfirmasi Hpaus
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Hapus Berita") },
+            text = { Text("Apakah Anda yakin ingin menghapus berita ini secara permanen?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.deleteNews()
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+                ) { Text("Hapus") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text("Batal") }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -67,14 +96,11 @@ fun DetailBeritaScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 is UiResult.Error -> {
-                    Text(
-                        text = state.message,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    Text(text = state.message, modifier = Modifier.align(Alignment.Center))
                 }
                 is UiResult.Success -> {
                     val news = state.data
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -83,9 +109,7 @@ fun DetailBeritaScreen(
                         AsyncImage(
                             model = news.imageUrl,
                             contentDescription = news.title,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(250.dp),
+                            modifier = Modifier.fillMaxWidth().height(250.dp),
                             contentScale = ContentScale.Crop
                         )
 
@@ -94,35 +118,69 @@ fun DetailBeritaScreen(
                                 text = news.title,
                                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                             )
-
                             Spacer(modifier = Modifier.height(8.dp))
+
                             Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.DateRange, null, Modifier.size(16.dp), tint = Color.Gray)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(news.datePublished.toString(), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                                 Spacer(modifier = Modifier.width(16.dp))
-                                Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.secondary)
+                                Icon(Icons.Default.Person, null, Modifier.size(16.dp), tint = Color.Gray)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = news.author ?: "Admin",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.secondary)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = news.datePublished.toString(), // Format tanggal bisa dirapikan nanti
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
+                                Text(news.author ?: "-", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = news.content,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+
+                            Text(text = news.content, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(32.dp))
+
+                            // --- TOMBOL AKSI (EDIT & HAPUS) ---
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Button(
+                                    onClick = { onNavigateToEdit(news.id) },
+                                    modifier = Modifier.weight(1f),
+                                    shape = MaterialTheme.shapes.small,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF2B3467) // Kode warna biru tua
+                                    )
+                                ) {
+                                    Text("Edit")
+                                }
+                                OutlinedButton(
+                                    onClick = { showDeleteDialog = true },
+                                    modifier = Modifier.weight(1f),
+                                    shape = MaterialTheme.shapes.small,
+                                    border = BorderStroke(1.dp, Color(0xFFB71C1C)),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = Color(0xFFB71C1C)
+                                    )
+                                ) {
+                                    Text("Hapus")
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
                         }
                     }
                 }
                 else -> {}
+            }
+
+            // Loading Overlay saat menghapus
+            if (deleteState is UiResult.Loading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }

@@ -18,8 +18,6 @@ class NewsViewModel : ViewModel() {
     init {
         fetchNews()
     }
-
-    // Fungsi untuk mengambil data berita dari repository
     fun fetchNews() {
         viewModelScope.launch {
             _uiState.value = UiResult.Loading

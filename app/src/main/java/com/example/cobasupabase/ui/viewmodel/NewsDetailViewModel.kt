@@ -21,6 +21,10 @@ class NewsDetailViewModel(
     private val _uiState = MutableStateFlow<UiResult<News>>(UiResult.Loading)
     val uiState = _uiState.asStateFlow()
 
+    //khusus delete berita
+    private val _deleteUiState = MutableStateFlow<UiResult<Boolean>>(UiResult.Idle)
+    val deleteUiState = _deleteUiState.asStateFlow()
+
     init {
         fetchNewsDetail()
     }
@@ -35,5 +39,22 @@ class NewsDetailViewModel(
                 _uiState.value = UiResult.Error(e.message ?: "Gagal memuat detail berita")
             }
         }
+    }
+
+    fun deleteNews() {
+        viewModelScope.launch {
+            _deleteUiState.value = UiResult.Loading
+            try {
+                repository.deleteNews(newsId)
+                _deleteUiState.value = UiResult.Success(true) // Berhasil hapus
+            } catch (e: Exception) {
+                _deleteUiState.value = UiResult.Error(e.message ?: "Gagal menghapus berita")
+            }
+        }
+    }
+
+    // Fungsi reset state
+    fun resetDeleteState() {
+        _deleteUiState.value = UiResult.Idle
     }
 }

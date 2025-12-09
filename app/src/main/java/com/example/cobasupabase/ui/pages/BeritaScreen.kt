@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.compose.runtime.LaunchedEffect
 import com.example.cobasupabase.ui.common.UiResult
 import com.example.cobasupabase.ui.components.NewsList
 import com.example.cobasupabase.ui.viewmodel.NewsViewModel
@@ -40,7 +45,18 @@ fun BeritaScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold { paddingValues ->
+    LaunchedEffect(Unit) {
+        viewModel.fetchNews()
+    }
+
+    Scaffold (
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate(Routes.AddNews) }) {
+                Icon(Icons.Default.Add, contentDescription = "AddNews")
+            }
+        }
+    ) {
+        paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -94,7 +110,6 @@ fun BeritaScreen(
                     }
                 }
                 is UiResult.Idle -> {
-                    // State idle biasanya hanya transisi, bisa dibiarkan kosong atau menampilkan loading
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(text = "Menunggu data...")
                     }
