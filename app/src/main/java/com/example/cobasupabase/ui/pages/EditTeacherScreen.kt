@@ -13,7 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -45,6 +47,7 @@ fun EditTeacherScreen(
     val context = LocalContext.current
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var newTagInput by remember { mutableStateOf("") }
 
     LaunchedEffect(teacherId) {
         viewModel.loadTeacher(teacherId)
@@ -179,7 +182,55 @@ fun EditTeacherScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(value = viewModel.imageUrl, onValueChange = { viewModel.imageUrl = it }, label = { Text("Or enter Image URL") }, modifier = Modifier.fillMaxWidth())
                         Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(value = viewModel.educationLevel, onValueChange = { viewModel.educationLevel = it }, label = { Text("Education Level (e.g., S1, S2)") }, modifier = Modifier.fillMaxWidth())
+                        
+                        // Education Tags Input and Display
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "Education Levels (Tags)",
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                OutlinedTextField(
+                                    value = newTagInput,
+                                    onValueChange = { newTagInput = it },
+                                    label = { Text("Add new tag") },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = {
+                                        if (newTagInput.isNotBlank()) {
+                                            viewModel.editableEducationTags.add(newTagInput.trim())
+                                            newTagInput = ""
+                                        }
+                                    },
+                                    enabled = newTagInput.isNotBlank()
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = "Add Tag")
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            FlowRow( // Use FlowRow for wrapping chips
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                viewModel.editableEducationTags.forEach { tag ->
+                                    InputChip(
+                                        selected = true, // Always selected for display
+                                        onClick = { /* No action on click for display */ },
+                                        label = { Text(tag) },
+                                        trailingIcon = {
+                                            IconButton(onClick = { viewModel.editableEducationTags.remove(tag) }) {
+                                                Icon(Icons.Default.Close, contentDescription = "Remove tag")
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(value = viewModel.price, onValueChange = { viewModel.price = it }, label = { Text("Price (e.g., Rp 100.000 / jam)") }, modifier = Modifier.fillMaxWidth())
                         Spacer(modifier = Modifier.height(16.dp))

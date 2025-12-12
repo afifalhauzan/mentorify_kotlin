@@ -1,6 +1,7 @@
 package com.example.cobasupabase.ui.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -35,7 +36,7 @@ class EditTeacherViewModel(
     var experience by mutableStateOf("")
     var linkedinUrl by mutableStateOf("")
     var imageUrl by mutableStateOf("") // This will hold the current URL or the new uploaded URL
-    var educationLevel by mutableStateOf("")
+    val editableEducationTags = mutableStateListOf<String>() // Changed to mutableStateListOf
     var price by mutableStateOf("")
     var imageBytes = MutableStateFlow<ByteArray?>(null)
         private set
@@ -60,9 +61,8 @@ class EditTeacherViewModel(
                     experience = teacher.experience ?: ""
                     linkedinUrl = teacher.linkedinUrl ?: ""
                     imageUrl = teacher.imageUrl ?: ""
-                    // educationLevel and price are not in Teacher model, assuming they are added to Teacher model.
-                    // For now, I'll initialize them as empty strings if not present in the model or use a default.
-                    educationLevel = teacher.educationTags.joinToString() // Assuming educationTags can be used here
+                    editableEducationTags.clear()
+                    editableEducationTags.addAll(teacher.educationTags)
                     price = teacher.price ?: ""
                     _teacherDataState.value = UiResult.Success(teacher)
                 } else {
@@ -113,7 +113,7 @@ class EditTeacherViewModel(
                     experience = experience.takeIf { it.isNotBlank() },
                     linkedinUrl = linkedinUrl.takeIf { it.isNotBlank() },
                     imageUrl = finalImageUrl.takeIf { it.isNotBlank() },
-                    educationLevel = educationLevel.takeIf { it.isNotBlank() },
+                    educationLevel = editableEducationTags.joinToString().takeIf { it.isNotBlank() }, // Join tags for DTO
                     price = price.takeIf { it.isNotBlank() }
                 )
                 repository.updateTeacher(currentTeacherId, teacherData)
