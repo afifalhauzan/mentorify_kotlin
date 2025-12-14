@@ -38,6 +38,7 @@ val bottomNavItems = listOf(
 
 @Composable
 fun MainHomeScreen(navController: NavHostController) {
+    // Controller khusus untuk Bottom Bar (Beranda, Cari, dll)
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -65,30 +66,45 @@ fun MainHomeScreen(navController: NavHostController) {
             }
         }
     ) { paddingValues ->
-        NavHost(bottomNavController, startDestination = BottomNavItem.Beranda.route, Modifier.padding(paddingValues)) {
+        // NavHost KHUSUS untuk menu Bottom Bar
+        NavHost(
+            navController = bottomNavController,
+            startDestination = BottomNavItem.Beranda.route,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+
+            // --- 1. BERANDA ---
             composable(Routes.Beranda) {
                 BerandaScreen(
-                    navController = navController, // Root controller for AddTodo, etc.
+                    navController = navController, // Root controller
                     onNavigateToCari = { bottomNavController.navigate(Routes.Cari) },
                     onNavigateToJadwal = { bottomNavController.navigate(Routes.Jadwal) },
                     onNavigateToTempat = { bottomNavController.navigate(Routes.Tempat) },
                     onNavigateToBerita = { bottomNavController.navigate(Routes.Berita) },
-                    onNavigateToReview = { bottomNavController.navigate(Routes.Review) },
+                    // [PENTING] Gunakan navController (ROOT) agar Detail Guru menutupi Bottom Bar
+                    // dan bisa mengakses halaman Review
                     onNavigateToTeacherDetail = { teacherId ->
-                        bottomNavController.navigate(Routes.buildTeacherDetailRoute(teacherId))
+                        navController.navigate(Routes.buildTeacherDetailRoute(teacherId))
+                    },
+                    // Sama, gunakan root controller jika ada tombol review langsung
+                    onNavigateToReview = {
+                        // navController.navigate(...)
                     }
                 )
             }
-            composable(Routes.Cari) { CariScreen(navController = bottomNavController) } // CORRECTED: Pass bottomNavController
+
+            // --- 2. MENU LAIN ---
+            composable(Routes.Cari) { CariScreen(navController = bottomNavController) }
             composable(Routes.Berita) { BeritaScreen() }
             composable(Routes.Profil) { ProfilScreen() }
-            composable(Routes.TeacherDetail) { backStackEntry ->
-                val teacherId = backStackEntry.arguments?.getString("teacherId") ?: ""
-                TeacherDetailScreen(teacherId = teacherId, navController = bottomNavController, onBack = { bottomNavController.popBackStack() })
-            }
+
+            // --- 3. SUB-MENU (Jadwal & Tempat) ---
+            // Ini tetap di bottom nav agar user bisa lihat menu bawah
             composable(Routes.Jadwal) { JadwalScreen(navController = bottomNavController) }
             composable(Routes.Tempat) { TempatScreen(navController = bottomNavController) }
-            composable(Routes.Review) { ReviewScreen(navController = bottomNavController) }
+
+            // [HAPUS] TeacherDetail dan Review dari sini!
+            // Kita biarkan AppNavHost (Root) yang menanganinya agar navigasinya lancar.
         }
     }
 }

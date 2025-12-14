@@ -1,22 +1,29 @@
 package com.example.cobasupabase.ui.nav
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
+// --- IMPORT HALAMAN (PAGES) ---
+import com.example.cobasupabase.ui.pages.AddTodoScreen
+import com.example.cobasupabase.ui.pages.DetailScreen
 import com.example.cobasupabase.ui.pages.LoginScreen
-import com.example.cobasupabase.ui.pages.RegisterScreen
 import com.example.cobasupabase.ui.pages.MainHomeScreen
+import com.example.cobasupabase.ui.pages.RegisterScreen
 import com.example.cobasupabase.ui.viewmodel.AuthViewModel
-import androidx.compose.ui.Modifier
-import androidx.compose.material3.Text // For OnboardingScreenPlaceholder
-import com.example.cobasupabase.ui.pages.AddTodoScreen // Import AddTodoScreen
-import com.example.cobasupabase.ui.pages.DetailScreen // Import DetailScreen
+import com.example.cobasupabase.ui.pages.ReviewListScreen
+import com.example.cobasupabase.ui.pages.AddReviewScreen
+import com.example.cobasupabase.ui.pages.TeacherDetailScreen // [PERBAIKAN] Tambahkan baris ini!
 
 object Graph {
     const val ROOT = "root_graph"
@@ -30,18 +37,24 @@ object Routes {
     const val Login = "login_route"
     const val Register = "register_route"
     const val Home = "home_route"
-    const val AddTodo = "addtodo_route" // Changed route name to match navigation call
+    const val AddTodo = "addtodo_route"
     const val Detail = "detail_route/{id}"
     const val Beranda = "beranda_route"
     const val Cari = "cari_route"
     const val Berita = "berita_route"
     const val Profil = "profil_route"
-    const val TeacherDetail = "teacher_detail_route/{teacherId}" // New route
-    const val Jadwal = "jadwal_route" // New route
-    const val Tempat = "tempat_route" // New route
-    const val Review = "review_route" // New route
+    const val TeacherDetail = "teacher_detail_route/{teacherId}"
+    const val Jadwal = "jadwal_route"
+    const val Tempat = "tempat_route"
+    const val Review = "review_route"
 
-    fun buildTeacherDetailRoute(teacherId: String) = "teacher_detail_route/$teacherId" // Helper function
+    fun buildTeacherDetailRoute(teacherId: String) = "teacher_detail_route/$teacherId"
+
+    const val ReviewList = "review_list/{teacherId}"
+    const val ReviewAdd = "review_add/{teacherId}"
+
+    fun buildReviewListRoute(id: String) = "review_list/$id"
+    fun buildReviewAddRoute(id: String) = "review_add/$id"
 }
 
 @Composable
@@ -50,15 +63,12 @@ fun AppNavigation(
     authViewModel: AuthViewModel = viewModel()
 ) {
     val isAuthenticated by authViewModel.isAuthenticated.collectAsStateWithLifecycle()
-
     val startDestination = if (isAuthenticated) Routes.Home else Routes.Login
 
     LaunchedEffect(isAuthenticated) {
         if (!isAuthenticated) {
             navController.navigate(Routes.Login) {
-                popUpTo(navController.graph.id) {
-                    inclusive = true
-                }
+                popUpTo(navController.graph.id) { inclusive = true }
             }
         } else {
             navController.navigate(Routes.Home) {
@@ -83,7 +93,7 @@ fun AppNavigation(
             LoginScreen(
                 viewModel = authViewModel,
                 onNavigateRegister = { navController.navigate(Routes.Register) },
-                onNavigateToForgotPassword = { /* TODO: Implement Forgot Password navigation */ }
+                onNavigateToForgotPassword = { /* TODO */ }
             )
         }
 
@@ -96,10 +106,10 @@ fun AppNavigation(
         }
 
         composable(Routes.Home) {
-            MainHomeScreen(navController = navController) // Pass the root navController
+            MainHomeScreen(navController = navController)
         }
 
-        composable(Routes.AddTodo) { // Added AddTodoScreen composable
+        composable(Routes.AddTodo) {
             AddTodoScreen(onDone = { navController.popBackStack() })
         }
 
@@ -108,8 +118,39 @@ fun AppNavigation(
             DetailScreen(id = id, onBack = { navController.popBackStack() })
         }
 
-        // Removed TeacherDetail, Jadwal, Tempat, and Review composables from here.
-        // They are now managed by the NavHost inside MainHomeScreen.
+        composable(
+            route = Routes.ReviewList,
+            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("teacherId") ?: ""
+            ReviewListScreen(
+                navController = navController,
+                teacherId = id
+            )
+        }
+
+        composable(
+            route = Routes.ReviewAdd,
+            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("teacherId") ?: ""
+            AddReviewScreen(
+                onBack = { navController.popBackStack() },
+                teacherId = id
+            )
+        }
+
+        // Rute TeacherDetail yang sebelumnya error sekarang akan berfungsi
+        composable(
+            route = Routes.TeacherDetail,
+            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val teacherId = backStackEntry.arguments?.getString("teacherId") ?: ""
+            TeacherDetailScreen(
+                teacherId = teacherId,
+                navController = navController
+            )
+        }
     }
 }
 

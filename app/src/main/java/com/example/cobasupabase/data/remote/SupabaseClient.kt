@@ -26,4 +26,3 @@ object SupabaseHolder {
     fun session(): UserSession? = client.auth.currentSessionOrNull()
 }
 
-
