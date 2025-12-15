@@ -180,13 +180,9 @@ fun AppNavigation(
 
         composable(
             route = Routes.ReviewEdit,
-            arguments = listOf(navArgument("reviewId") { type = NavType.LongType })
+            arguments = listOf(navArgument("reviewId") { type = NavType.LongType }) // <--- INI WAJIB
         ) {
-            // Kita tidak perlu mengambil argument di sini karena ViewModel EditReviewViewModel
-            // akan mengambilnya sendiri menggunakan SavedStateHandle
-            EditReviewScreen(
-                onBack = { navController.popBackStack() }
-            )
+            EditReviewScreen(onBack = { navController.popBackStack() })
         }
     }
 }
