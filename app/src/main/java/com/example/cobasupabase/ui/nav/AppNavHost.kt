@@ -13,6 +13,8 @@ import com.example.cobasupabase.ui.pages.*
 import com.example.cobasupabase.ui.viewmodel.AuthViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.cobasupabase.ui.pages.PlaceListScreen
+
 
 object Graph {
     const val ROOT = "root_graph"
@@ -143,7 +145,7 @@ fun AppNavigation(
         }
 
         composable(Routes.Tempat) {
-            TempatScreen(navController = navController)
+            PlaceListScreen()
         }
 
         // Composable for a specific teacher's reviews
