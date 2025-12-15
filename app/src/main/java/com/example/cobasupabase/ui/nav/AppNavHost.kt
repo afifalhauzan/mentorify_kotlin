@@ -37,10 +37,11 @@ object Routes {
     const val ReviewList = "review_list/{teacherId}" // Specific teacher's reviews
     const val AllReviewsList = "all_reviews_list" // All reviews
     const val ReviewAdd = "review_add/{teacherId}"
+    const val ReviewEdit = "review_edit/{reviewId}"
 
     fun buildReviewListRoute(id: Int) = "review_list/$id"
     fun buildReviewAddRoute(id: Int) = "review_add/$id"
-
+    fun buildReviewEditRoute(reviewId: Long) = "review_edit/$reviewId"
 
     fun buildTeacherDetailRoute(teacherId: Int) = "teacher_detail_route/$teacherId"
     fun buildTeacherEditRoute(teacherId: Int) = "edit_teacher_route/$teacherId"
@@ -174,6 +175,17 @@ fun AppNavigation(
             AddReviewScreen(
                 onBack = { navController.popBackStack() },
                 teacherId = id
+            )
+        }
+
+        composable(
+            route = Routes.ReviewEdit,
+            arguments = listOf(navArgument("reviewId") { type = NavType.LongType })
+        ) {
+            // Kita tidak perlu mengambil argument di sini karena ViewModel EditReviewViewModel
+            // akan mengambilnya sendiri menggunakan SavedStateHandle
+            EditReviewScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }
