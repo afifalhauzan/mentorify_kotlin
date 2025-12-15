@@ -70,7 +70,10 @@ class NewsRepository {
 
     // upload Gambar untuk createNews
     suspend fun uploadImage(byteArray: ByteArray): String {
-        val fileName = "news_${System.currentTimeMillis()}.jpg"
+        val currentUser = auth.currentUserOrNull()
+            ?: throw Exception("User belum login! Tidak bisa mengupload gambar.")
+
+        val fileName = "${currentUser.id}/news_${System.currentTimeMillis()}.jpg"
         val bucket = storage["news-images"]
 
         bucket.upload(fileName, byteArray)

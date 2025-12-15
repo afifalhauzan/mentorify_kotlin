@@ -72,9 +72,9 @@ fun MainHomeScreen(navController: NavHostController) {
                 BerandaScreen(
                     onNavigateToJadwal = { navController.navigate(Routes.Jadwal) },
                     onNavigateToTempat = { navController.navigate(Routes.Tempat) },
-                    onNavigateToReview = { navController.navigate(Routes.Review) },
+                    onNavigateToReview = { navController.navigate(Routes.ReviewList) },
                     onNavigateToTeacherDetail = { teacherId ->
-                        navController.navigate(Routes.buildTeacherDetailRoute(teacherId))
+                        navController.navigate(Routes.buildTeacherDetailRoute(teacherId.toInt()))
                     }
                 )
             }
@@ -82,7 +82,7 @@ fun MainHomeScreen(navController: NavHostController) {
                 CariScreen(
                     onNavigateToCreateTeacher = { navController.navigate(Routes.CreateTeacher) },
                     onNavigateToTeacherDetail = { teacherId ->
-                        navController.navigate(Routes.buildTeacherDetailRoute(teacherId))
+                        navController.navigate(Routes.buildTeacherDetailRoute(teacherId.toInt()))
                     }
                 )
             }
@@ -95,12 +95,12 @@ fun MainHomeScreen(navController: NavHostController) {
             composable(Routes.Profil) { ProfilScreen() }
             composable(Routes.Jadwal) { JadwalScreen(navController = navController) }
             composable(Routes.Tempat) { TempatScreen(navController = navController) }
-            composable(Routes.Review) { ReviewScreen(navController = navController) }
+            composable(Routes.ReviewList) { ReviewListScreen(navController = navController) }
             composable(
                 route = Routes.EditTeacher,
-                arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+                arguments = listOf(navArgument("teacherId") { type = NavType.IntType; defaultValue = -1 })
             ) { backStackEntry ->
-                val teacherId = backStackEntry.arguments?.getString("teacherId") ?: ""
+                val teacherId = backStackEntry.arguments?.getInt("teacherId") ?: -1
                 EditTeacherScreen(teacherId = teacherId, navController = navController)
             }
         }

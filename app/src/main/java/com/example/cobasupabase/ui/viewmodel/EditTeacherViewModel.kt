@@ -20,7 +20,7 @@ class EditTeacherViewModel(
     private val repository: TeacherRepository = TeacherRepository()
 ) : ViewModel() {
 
-    var teacherId: String? = null
+    var teacherId: Int? = null
 
     // State for fetching the initial teacher data
     private val _teacherDataState = MutableStateFlow<UiResult<Teacher>?>(UiResult.Idle)
@@ -45,7 +45,7 @@ class EditTeacherViewModel(
     private val _updateUiState = MutableStateFlow<UiResult<Unit>?>(null)
     val updateUiState: StateFlow<UiResult<Unit>?> = _updateUiState
 
-    fun loadTeacher(id: String) {
+    fun loadTeacher(id: Int) {
         teacherId = id
         viewModelScope.launch {
             _teacherDataState.value = UiResult.Loading

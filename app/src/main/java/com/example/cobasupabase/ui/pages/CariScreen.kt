@@ -24,7 +24,7 @@ import com.example.cobasupabase.ui.viewmodel.TeacherViewModel
 
 @Composable
 fun CariScreen(
-    onNavigateToTeacherDetail: (String) -> Unit,
+    onNavigateToTeacherDetail: (Int) -> Unit,
     onNavigateToCreateTeacher: () -> Unit,
     viewModel: TeacherViewModel = viewModel()
 ) {

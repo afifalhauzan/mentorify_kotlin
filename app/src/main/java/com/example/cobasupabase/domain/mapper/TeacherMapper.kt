@@ -6,7 +6,7 @@ import com.example.cobasupabase.domain.model.Teacher
 object TeacherMapper {
     fun map(dto: TeacherDto): Teacher {
         return Teacher(
-            id = dto.id.toString(),
+            id = dto.id,
             userId = dto.userId ?: "",
             name = dto.name,
             subject = dto.subject,

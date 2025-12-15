@@ -38,7 +38,7 @@ import java.io.InputStream
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTeacherScreen(
-    teacherId: String,
+    teacherId: Int,
     navController: NavHostController,
     viewModel: EditTeacherViewModel = viewModel()
 ) {
@@ -273,5 +273,5 @@ fun EditTeacherScreen(
 @Preview(showBackground = true)
 @Composable
 fun EditTeacherScreenPreview() {
-    EditTeacherScreen(teacherId = "1", navController = rememberNavController())
+    EditTeacherScreen(teacherId = 1, navController = rememberNavController())
 }

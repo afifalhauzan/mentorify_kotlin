@@ -29,7 +29,7 @@ fun BerandaScreen(
     onNavigateToJadwal: () -> Unit,
     onNavigateToTempat: () -> Unit,
     onNavigateToReview: () -> Unit,
-    onNavigateToTeacherDetail: (String) -> Unit
+    onNavigateToTeacherDetail: (Int) -> Unit
 ) {
     val currentUserEmail by authViewModel.currentUserEmail.collectAsState()
     val teacherUiState by teacherViewModel.uiState.collectAsState()

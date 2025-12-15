@@ -35,8 +35,15 @@ object Routes {
     const val Review = "review_route"
     const val CreateTeacher = "create_teacher_route"
     const val EditTeacher = "edit_teacher_route/{teacherId}"
+    const val ReviewList = "review_list/{teacherId}"
+    const val ReviewAdd = "review_add/{teacherId}"
 
-    fun buildTeacherDetailRoute(teacherId: String) = "teacher_detail_route/$teacherId"
+    fun buildReviewListRoute(id: Int) = "review_list/$id"
+    fun buildReviewAddRoute(id: Int) = "review_add/$id"
+
+
+    fun buildTeacherDetailRoute(teacherId: Int) = "teacher_detail_route/$teacherId"
+    fun buildTeacherEditRoute(teacherId: Int) = "edit_teacher_route/$teacherId"
     fun buildBeritaDetailRoute(newsId: Int) = "news_detail/$newsId"
     fun buildBeritaEditRoute(newsId: Int) = "news_edit_route/$newsId"
 }
@@ -84,19 +91,20 @@ fun AppNavigation(
         }
         composable(
             route = Routes.EditTeacher,
-            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+            arguments = listOf(navArgument("teacherId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val teacherId = backStackEntry.arguments?.getString("teacherId") ?: ""
+            val teacherId = backStackEntry.arguments?.getInt("teacherId") ?: -1
             EditTeacherScreen(teacherId = teacherId, navController = navController)
         }
 
         composable(
             route = Routes.TeacherDetail,
-            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+            arguments = listOf(navArgument("teacherId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("teacherId") ?: ""
+            val id = backStackEntry.arguments?.getInt("teacherId") ?: -1
             TeacherDetailScreen(
                 teacherId = id,
+                buildTeacherEditRoute = id,
                 navController = navController
             )
         }
@@ -137,8 +145,30 @@ fun AppNavigation(
             TempatScreen(navController = navController)
         }
 
-        composable(Routes.Review) {
+        composable(Routes.ReviewList) {
             ReviewScreen(navController = navController)
+        }
+
+        composable(
+            route = Routes.ReviewList,
+            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("teacherId") ?: -1
+            ReviewListScreen(
+                navController = navController,
+                teacherId = id
+            )
+        }
+
+        composable(
+            route = Routes.ReviewAdd,
+            arguments = listOf(navArgument("teacherId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("teacherId") ?: -1
+            AddReviewScreen(
+                onBack = { navController.popBackStack() },
+                teacherId = id
+            )
         }
     }
 }

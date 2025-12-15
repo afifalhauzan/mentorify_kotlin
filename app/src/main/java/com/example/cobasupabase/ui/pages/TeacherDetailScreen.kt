@@ -41,8 +41,9 @@ import com.example.cobasupabase.ui.viewmodel.TeacherViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherDetailScreen(
-    teacherId: String,
+    teacherId: Int,
     navController: NavHostController,
+    buildTeacherEditRoute: Int,
     viewModel: TeacherViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -65,6 +66,7 @@ fun TeacherDetailScreen(
         when (deleteState) {
             is UiResult.Success -> {
                 Toast.makeText(context, "Teacher deleted successfully!", Toast.LENGTH_SHORT).show()
+                navController.popBackStack(Routes.MainHomeRoute, inclusive = false)
             }
             is UiResult.Error -> {
                 Toast.makeText(context, "Failed to delete teacher: ${(deleteState as UiResult.Error).message}", Toast.LENGTH_LONG).show()
@@ -96,7 +98,7 @@ fun TeacherDetailScreen(
                                 text = { Text("Edit") },
                                 onClick = {
                                     showMenu = false
-                                    navController.navigate(Routes.EditTeacher.replace("{teacherId}", teacherId))
+                                    navController.navigate(Routes.buildTeacherEditRoute(teacherId)) // Corrected navigation
                                 },
                                 enabled = isOwner
                             )
@@ -289,7 +291,7 @@ fun TeacherDetailContent(teacher: Teacher, navController: NavHostController) {
             Text("Lihat Jadwal")
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = { navController.navigate(Routes.Review) }, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = { navController.navigate(Routes.ReviewList) }, modifier = Modifier.fillMaxWidth()) {
             Text("Lihat Review")
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -301,7 +303,7 @@ fun TeacherDetailContent(teacher: Teacher, navController: NavHostController) {
 fun TeacherDetailScreenPreview() {
     val navController = rememberNavController()
     val fakeTeacher = Teacher(
-        id = "1",
+        id = 1,
         userId = "676767",
         name = "Dr. Budi Hartono",
         subject = "Fisika Kuantum",

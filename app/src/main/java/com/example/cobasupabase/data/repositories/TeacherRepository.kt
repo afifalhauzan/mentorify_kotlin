@@ -22,7 +22,7 @@ class TeacherRepository {
         return listDto.map { TeacherMapper.map(it) }
     }
 
-    suspend fun getTeacherById(id: String): Teacher? {
+    suspend fun getTeacherById(id: Int): Teacher? {
         val response = postgrest["teachers"].select {
             filter {
                 eq("id", id)
@@ -35,7 +35,7 @@ class TeacherRepository {
         postgrest["teachers"].insert(teacherData)
     }
 
-    suspend fun updateTeacher(id: String, teacherData: TeacherInsert) {
+    suspend fun updateTeacher(id: Int, teacherData: TeacherInsert) {
         postgrest["teachers"].update(teacherData) {
             filter {
                 eq("id", id)
@@ -43,7 +43,7 @@ class TeacherRepository {
         }
     }
 
-    suspend fun deleteTeacher(id: String) {
+    suspend fun deleteTeacher(id: Int) {
         try {
             val response = postgrest["teachers"].delete { // Capture the response
                 filter {

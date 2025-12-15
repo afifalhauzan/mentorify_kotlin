@@ -37,7 +37,7 @@ import coil.compose.AsyncImage
 import com.example.cobasupabase.domain.model.Teacher
 
 @Composable
-fun TeacherCard(teacher: Teacher, modifier: Modifier = Modifier, onClick: (String) -> Unit) {
+fun TeacherCard(teacher: Teacher, modifier: Modifier = Modifier, onClick: (Int) -> Unit) {
     Card(
         modifier = modifier
             .width(200.dp)
@@ -122,7 +122,7 @@ fun TeacherCard(teacher: Teacher, modifier: Modifier = Modifier, onClick: (Strin
 fun TeacherCardPreview() {
     TeacherCard(
         teacher = Teacher(
-            id = "T1",
+            id = 1,
             userId = "676767",
             name = "Mita Elara",
             subject = "Matematika",

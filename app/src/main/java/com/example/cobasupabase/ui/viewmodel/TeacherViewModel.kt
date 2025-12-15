@@ -53,7 +53,7 @@ class TeacherViewModel(
         }
     }
 
-    fun fetchTeacherById(id: String) {
+    fun fetchTeacherById(id: Int) {
         viewModelScope.launch {
             _teacherDetailState.value = UiResult.Loading
             try {
@@ -69,7 +69,7 @@ class TeacherViewModel(
         }
     }
 
-    fun deleteTeacher(id: String) {
+    fun deleteTeacher(id: Int) {
         viewModelScope.launch {
             _deleteUiState.value = UiResult.Loading
             try {
