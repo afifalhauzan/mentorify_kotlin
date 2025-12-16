@@ -8,6 +8,8 @@ import com.example.cobasupabase.ui.common.UiResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.cobasupabase.data.remote.SupabaseHolder
+import io.github.jan.supabase.gotrue.auth
 
 class ReviewViewModel(
     private val repo: ReviewRepository = ReviewRepository()
@@ -23,6 +25,21 @@ class ReviewViewModel(
     val ratingInput = MutableStateFlow(5)
     val commentInput = MutableStateFlow("")
     val imageBytesInput = MutableStateFlow<ByteArray?>(null)
+
+    private val _currentUserId = MutableStateFlow<String?>(null)
+    val currentUserId = _currentUserId.asStateFlow()
+
+    private val _deleteState = MutableStateFlow<UiResult<Boolean>>(UiResult.Idle)
+    val deleteState = _deleteState.asStateFlow()
+
+    init {
+        // ... loadAllReviews() jika ada
+        loadCurrentUser()
+    }
+
+    private fun loadCurrentUser() {
+        _currentUserId.value = SupabaseHolder.client.auth.currentUserOrNull()?.id
+    }
 
     fun loadReviews(teacherId: Int) {
         viewModelScope.launch {
@@ -71,5 +88,28 @@ class ReviewViewModel(
         ratingInput.value = 5
         commentInput.value = ""
         imageBytesInput.value = null
+    }
+
+    fun deleteReview(reviewId: Long, teacherId: Int?) {
+        viewModelScope.launch {
+            _deleteState.value = UiResult.Loading
+            try {
+                repo.deleteReview(reviewId)
+                _deleteState.value = UiResult.Success(true)
+
+                // Refresh list setelah hapus
+                if (teacherId != null && teacherId != 0) {
+                    loadReviews(teacherId)
+                } else {
+                    loadAllReviews()
+                }
+            } catch (e: Exception) {
+                _deleteState.value = UiResult.Error(e.message ?: "Gagal menghapus review")
+            }
+        }
+    }
+
+    fun resetDeleteState() {
+        _deleteState.value = UiResult.Idle
     }
 }

@@ -62,4 +62,41 @@ class ReviewRepository(
         )
         client.postgrest["reviews"].insert(newReview)
     }
+
+    suspend fun getReviewById(reviewId: Long): ReviewDto? {
+        return client.postgrest["reviews"].select {
+            filter { eq("id", reviewId) }
+        }.decodeSingleOrNull<ReviewDto>()
+    }
+
+    // 2. Update Review
+    suspend fun updateReview(reviewId: Long, rating: Int, comment: String, imageBytes: ByteArray?, currentImageUrl: String?) {
+        val user = client.auth.currentUserOrNull() ?: throw Exception("Wajib Login")
+
+        var finalImageUrl = currentImageUrl
+
+        // Jika ada gambar baru di-upload
+        if (imageBytes != null) {
+            val fileName = "${user.id}/review_${System.currentTimeMillis()}.jpg"
+            val bucket = client.storage["review-images"]
+            bucket.upload(fileName, imageBytes)
+            finalImageUrl = bucket.publicUrl(fileName)
+        }
+
+        // Update ke Supabase
+        client.postgrest["reviews"].update({
+            set("rating", rating)
+            set("comment", comment)
+            set("avatar_url", finalImageUrl)
+        }) {
+            filter { eq("id", reviewId) }
+        }
+    }
+
+    // 3. Delete Review
+    suspend fun deleteReview(reviewId: Long) {
+        client.postgrest["reviews"].delete {
+            filter { eq("id", reviewId) }
+        }
+    }
 }
