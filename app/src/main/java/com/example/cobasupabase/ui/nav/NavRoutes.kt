@@ -6,7 +6,7 @@ sealed class Screen(val route: String) {
     object Beranda : Screen("beranda")
     object Cari : Screen("cari")
     object Jadwal : Screen("jadwal")
-    object Tempat : Screen("tempat")
+    object PlaceList : Screen("tempat")
     object Berita : Screen("berita")
     object Profil : Screen("profil")
 
@@ -24,5 +24,9 @@ sealed class Screen(val route: String) {
     //Teacher
     object EditTeacher : Screen("edit_teacher_route/{teacherId}") {
         fun build(teacherId: String) = "edit_teacher_route/$teacherId"
+    }
+
+    object PlaceDetail : Screen("place_detail/{placeId}") {
+        fun build(placeId: Int) = "place_detail/$placeId"
     }
 }

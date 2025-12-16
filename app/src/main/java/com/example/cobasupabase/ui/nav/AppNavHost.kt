@@ -13,6 +13,16 @@ import com.example.cobasupabase.ui.pages.*
 import com.example.cobasupabase.ui.viewmodel.AuthViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.cobasupabase.ui.pages.PlaceListScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.navArgument
+import com.example.cobasupabase.ui.pages.PlaceDetailScreen
+import com.example.cobasupabase.ui.pages.PlaceListScreen
+import com.example.cobasupabase.ui.viewmodel.PlaceViewModel
+import com.example.cobasupabase.ui.nav.Screen
+import com.example.cobasupabase.ui.pages.CreatePlaceScreen
+import com.example.cobasupabase.data.remote.SupabaseHolder
+import io.github.jan.supabase.gotrue.auth
 
 object Graph {
     const val ROOT = "root_graph"
@@ -38,6 +48,8 @@ object Routes {
     const val AllReviewsList = "all_reviews_list" // All reviews
     const val ReviewAdd = "review_add/{teacherId}"
     const val ReviewEdit = "review_edit/{reviewId}"
+    const val CreatePlace = "create_place"
+    const val PlaceDetail = "place_detail/{placeId}" // Added PlaceDetail route
 
     fun buildReviewListRoute(id: Int) = "review_list/$id"
     fun buildReviewAddRoute(id: Int) = "review_add/$id"
@@ -47,6 +59,7 @@ object Routes {
     fun buildTeacherEditRoute(teacherId: Int) = "edit_teacher_route/$teacherId"
     fun buildBeritaDetailRoute(newsId: Int) = "news_detail/$newsId"
     fun buildBeritaEditRoute(newsId: Int) = "news_edit_route/$newsId"
+    fun buildPlaceDetailRoute(placeId: Int) = "place_detail/$placeId" // Added buildPlaceDetailRoute
 }
 
 @Composable
@@ -144,7 +157,43 @@ fun AppNavigation(
         }
 
         composable(Routes.Tempat) {
-            TempatScreen(navController = navController)
+            PlaceListScreen(
+                viewModel = viewModel(),
+                onNavigateToDetail = { placeId ->
+                    navController.navigate(Routes.buildPlaceDetailRoute(placeId)) // Using new build function
+                },
+                onNavigateToCreatePlace = {
+                    navController.navigate(Routes.CreatePlace)
+                },
+                navController = navController
+            )
+        }
+
+        composable(
+            route = Routes.PlaceDetail, // Using new route constant
+            arguments = listOf(navArgument("placeId") { type = NavType.IntType; defaultValue = 0 })
+        ) { backStackEntry ->
+            val placeId = backStackEntry.arguments?.getInt("placeId") ?: 0
+            val placeViewModel: PlaceViewModel = viewModel()
+            PlaceDetailScreen(
+                placeId = placeId,
+                viewModel = placeViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.CreatePlace) {
+            val placeViewModel: PlaceViewModel = viewModel()
+            val currentUserId = SupabaseHolder.client.auth.currentUserOrNull()?.id // Get actual user ID
+
+            CreatePlaceScreen(
+                viewModel = placeViewModel,
+                currentUserId = currentUserId ?: "", // Pass actual user ID, handle null
+                onPlaceCreated = {
+                    navController.popBackStack()
+                },
+                onBack = { navController.popBackStack() }
+            )
         }
 
         // Composable for a specific teacher's reviews
@@ -159,11 +208,11 @@ fun AppNavigation(
             )
         }
 
-        // Composable for all reviews (no teacherId)
+        // Composable for all reviews (no teacherId) - removed nullable and default value
         composable(Routes.AllReviewsList) {
             ReviewListScreen(
                 navController = navController,
-                teacherId = null // Pass null to indicate all reviews
+                teacherId = 0 // Explicitly pass 0 to indicate all reviews
             )
         }
 
@@ -180,7 +229,7 @@ fun AppNavigation(
 
         composable(
             route = Routes.ReviewEdit,
-            arguments = listOf(navArgument("reviewId") { type = NavType.LongType }) // <--- INI WAJIB
+            arguments = listOf(navArgument("reviewId") { type = NavType.LongType; defaultValue = -1L })
         ) {
             EditReviewScreen(onBack = { navController.popBackStack() })
         }
