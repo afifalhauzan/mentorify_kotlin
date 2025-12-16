@@ -41,7 +41,7 @@ class TeacherViewModel(
         _currentUserId.value = SupabaseHolder.client.auth.currentUserOrNull()?.id
     }
 
-    private fun fetchTeachers() {
+    fun fetchTeachers() {
         viewModelScope.launch {
             _uiState.value = UiResult.Loading
             try {

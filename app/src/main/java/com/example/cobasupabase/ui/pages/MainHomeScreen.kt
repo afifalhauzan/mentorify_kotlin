@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cobasupabase.ui.nav.Routes
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.cobasupabase.ui.viewmodel.TeacherViewModel
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Beranda : BottomNavItem(Routes.Beranda, Icons.Default.Home, "Beranda")
@@ -83,7 +84,9 @@ fun MainHomeScreen(navController: NavHostController) {
                     onNavigateToCreateTeacher = { navController.navigate(Routes.CreateTeacher) },
                     onNavigateToTeacherDetail = { teacherId ->
                         navController.navigate(Routes.buildTeacherDetailRoute(teacherId.toInt()))
-                    }
+                    },
+                    navController = navController,
+                    viewModel = TeacherViewModel(),
                 )
             }
             composable(Routes.Berita) {  BeritaScreen(

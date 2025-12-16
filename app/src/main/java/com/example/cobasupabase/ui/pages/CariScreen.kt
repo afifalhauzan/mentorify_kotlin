@@ -26,15 +26,26 @@ import com.example.cobasupabase.ui.viewmodel.TeacherViewModel
 
 @Composable
 fun CariScreen(
+    navController: NavHostController, // Added navController
     onNavigateToTeacherDetail: (Int) -> Unit,
     onNavigateToCreateTeacher: () -> Unit,
     viewModel: TeacherViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    
+    // Observe back stack entry for refresh
+    val backStackEntry = navController.currentBackStackEntry
+
+    LaunchedEffect(backStackEntry) {
+        // Only fetch when the current route is Cari to avoid unnecessary fetches on other tab changes
+        if (backStackEntry?.destination?.route == Routes.Cari) {
+            viewModel.fetchTeachers()
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToCreateTeacher) { // CORRECTED
+            FloatingActionButton(onClick = onNavigateToCreateTeacher) {
                 Icon(Icons.Default.Add, contentDescription = "Tambah Guru")
             }
         }
@@ -78,10 +89,10 @@ fun CariScreen(
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth().height(800.dp) // Added a fixed height for LazyVerticalGrid
+                            modifier = Modifier.fillMaxWidth().height(800.dp)
                         ) {
                             items(state.data) { teacher ->
-                                TeacherCard(teacher = teacher, onClick = onNavigateToTeacherDetail) // CORRECTED
+                                TeacherCard(teacher = teacher, onClick = onNavigateToTeacherDetail)
                             }
                         }
                     }
@@ -95,7 +106,9 @@ fun CariScreen(
 @Preview(showBackground = true)
 @Composable
 fun CariScreenPreview() {
+    // Need to provide a mock NavHostController for preview
     CariScreen(
+        navController = rememberNavController(),
         onNavigateToTeacherDetail = {},
         onNavigateToCreateTeacher = {}
     )
