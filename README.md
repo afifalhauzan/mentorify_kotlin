@@ -30,13 +30,10 @@ Ulasan**. Data bersumber dari tabel database: reviews.
 ## 🛠 Tech Stack & Library
 
 Aplikasi ini dibangun dengan arsitektur modern dan library standar industri:
-
 ```
 ● Bahasa: **Kotlin**
 ● UI Framework: **Jetpack Compose** (Material Design 3)
-● Backend as a Service: **Supabase**
-● Authentication: Email & Password Login.
-● Database: **PostgreSQL** dengan Row Level Security (RLS).
+● Backend as a Service: **Supabase (Postgres) dengan Row Level Security (RLS)**
 ● Arsitektur: **MVVM** (Model - View - ViewModel) + Clean Architecture (Data/Domain/UI).
 ```
 ## 📱 Fitur Utama
