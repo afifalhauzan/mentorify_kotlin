@@ -20,6 +20,7 @@ class ScheduleViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
+        // ✅ PERBAIKAN: Memastikan data diambil segera saat ViewModel pertama kali dibuat.
         fetchSchedules()
     }
 
@@ -32,7 +33,7 @@ class ScheduleViewModel : ViewModel() {
                 val rawSchedules = repository.getSchedules()
                 println("🟢 [ViewModel] Fetched ${rawSchedules.size} schedules")
 
-                // ✅ PERBAIKAN: Implementasi parsing untuk mengisi nama/mapel dan status
+                // Re-implementasi parsing untuk mengisi nama/mapel dan status
                 _schedules.value = rawSchedules.map { schedule ->
                     // Memisahkan string status menjadi [Nama Guru, Mata Pelajaran, Status Aktual]
                     val parts = schedule.status.split("|").map { it.trim() }
@@ -68,14 +69,9 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                println("🔵 [ViewModel] Adding schedule: $dto")
-
                 repository.addSchedule(dto)
-                println("🟢 [ViewModel] Schedule added successfully")
-
                 fetchSchedules()
             } catch (e: Exception) {
-                println("🔴 [ViewModel] Error adding schedule: ${e.message}")
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false
@@ -87,14 +83,9 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                println("🔵 [ViewModel] Updating schedule ID: $id")
-
                 repository.updateSchedule(id, dto)
-                println("🟢 [ViewModel] Schedule updated successfully")
-
                 fetchSchedules()
             } catch (e: Exception) {
-                println("🔴 [ViewModel] Error updating schedule: ${e.message}")
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false
@@ -106,15 +97,10 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                println("🔵 [ViewModel] Deleting schedule ID: $id")
-
                 repository.deleteSchedule(id)
-                println("🟢 [ViewModel] Schedule deleted successfully")
-
                 // Refresh jadwal untuk update UI
                 fetchSchedules()
             } catch (e: Exception) {
-                println("🔴 [ViewModel] Error deleting schedule: ${e.message}")
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false
