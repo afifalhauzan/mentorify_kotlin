@@ -93,7 +93,6 @@ fun MainHomeScreen(navController: NavHostController) {
             ) }
             // Removed BeritaDetail, BeritaEdit, AddNews from here
             composable(Routes.Profil) { ProfilScreen() }
-            composable(Routes.Jadwal) { JadwalScreen(navController = navController) }
             composable(Routes.Tempat) { TempatScreen(navController = navController) }
             composable(Routes.ReviewList) { ReviewListScreen(navController = navController) }
             composable(

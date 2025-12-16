@@ -23,6 +23,7 @@ import com.example.cobasupabase.ui.nav.Screen
 import com.example.cobasupabase.ui.pages.CreatePlaceScreen
 import com.example.cobasupabase.data.remote.SupabaseHolder
 import io.github.jan.supabase.gotrue.auth
+import com.example.cobasupabase.ui.pages.JadwalScreen
 
 object Graph {
     const val ROOT = "root_graph"
@@ -50,6 +51,9 @@ object Routes {
     const val ReviewEdit = "review_edit/{reviewId}"
     const val CreatePlace = "create_place"
     const val PlaceDetail = "place_detail/{placeId}" // Added PlaceDetail route
+    const val AddJadwal = "add_jadwal"
+    const val EditJadwal = "edit_jadwal/{id}"
+    const val JadwalDetail = "jadwal_detail/{id}" // <-- DITAMBAHKAN KONSTANTA
 
     fun buildReviewListRoute(id: Int) = "review_list/$id"
     fun buildReviewAddRoute(id: Int) = "review_add/$id"
@@ -60,6 +64,8 @@ object Routes {
     fun buildBeritaDetailRoute(newsId: Int) = "news_detail/$newsId"
     fun buildBeritaEditRoute(newsId: Int) = "news_edit_route/$newsId"
     fun buildPlaceDetailRoute(placeId: Int) = "place_detail/$placeId" // Added buildPlaceDetailRoute
+    fun buildEditJadwalRoute(id: Long) = "edit_jadwal/$id"
+    fun buildJadwalDetailRoute(id: Long) = "jadwal_detail/$id" // <-- DITAMBAHKAN BUILDER
 }
 
 @Composable
@@ -152,10 +158,6 @@ fun AppNavigation(
             )
         }
 
-        composable(Routes.Jadwal) {
-            JadwalScreen(navController = navController)
-        }
-
         composable(Routes.Tempat) {
             PlaceListScreen(
                 viewModel = viewModel(),
@@ -232,6 +234,41 @@ fun AppNavigation(
             arguments = listOf(navArgument("reviewId") { type = NavType.LongType; defaultValue = -1L })
         ) {
             EditReviewScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.Jadwal) {
+            JadwalScreen(
+                navController = navController, // Oper Root NavController
+                onNavigateToDetail = { jadwalId ->
+                    navController.navigate(Routes.buildJadwalDetailRoute(jadwalId))
+                },
+                onNavigateToAdd = {
+                    navController.navigate(Routes.AddJadwal)
+                }
+            )
+        }
+
+        composable(
+            route = Routes.JadwalDetail,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) {
+            val id = it.arguments?.getLong("id")!!
+            JadwalDetailScreen(navController, id)
+        }
+
+        composable(Routes.AddJadwal) {
+            AddEditJadwalScreen(navController = navController)
+        }
+
+        composable(
+            route = Routes.EditJadwal,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) {
+            val id = it.arguments?.getLong("id")
+            AddEditJadwalScreen(
+                navController = navController,
+                id = id
+            )
         }
     }
 }
