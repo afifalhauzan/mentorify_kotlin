@@ -28,21 +28,25 @@ fun AddEditJadwalScreen(
     var subject by remember { mutableStateOf("") }
     var day by remember { mutableStateOf("") }
     var timeRange by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf("Available") }
 
     var expandedDay by remember { mutableStateOf(false) }
     var expandedTime by remember { mutableStateOf(false) }
+    var expandedStatus by remember { mutableStateOf(false) }
 
     val days = listOf("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu")
     val times = listOf(
-        "08:00 - 09:00",
-        "09:00 - 10:00",
-        "10:00 - 11:00",
-        "11:00 - 12:00",
-        "13:00 - 14:00",
-        "14:00 - 15:00",
-        "15:00 - 16:00",
-        "16:00 - 17:00"
+        "08.00 - 09.00",
+        "09.00 - 10.00",
+        "10.00 - 11.00",
+        "11.00 - 12.00",
+        "13.00 - 14.00",
+        "14.00 - 15.00",
+        "15.00 - 16.00",
+        "16.00 - 17.00",
+        "19.00 - 20.00"
     )
+    val statusOptions = listOf("Available", "Confirmed", "Pending", "Cancelled")
 
     LaunchedEffect(id) {
         if (id != null) {
@@ -50,8 +54,9 @@ fun AddEditJadwalScreen(
             schedule?.let {
                 day = it.day
                 timeRange = it.timeRange
+                status = it.status
                 teacherName = it.teacherName
-                subject = it.subject
+                subject = it.teacherSubject
             }
         }
     }
@@ -215,22 +220,11 @@ fun AddEditJadwalScreen(
                 onClick = {
                     if (day.isBlank() || timeRange.isBlank()) return@Button
 
-                    val statusValue = if (teacherName.isNotEmpty()) {
-                        if (subject.isNotEmpty()) {
-                            "$teacherName|$subject"
-                        } else {
-                            teacherName
-                        }
-                    } else {
-                        subject.ifEmpty { "Available" }
-                    }
-
                     val dto = ScheduleCreateDto(
-                        userId = null,
-                        teacherId = null,
+                        teacherId = null, // Nanti akan gunakan relasi ke teachers
                         day = day,
                         timeRange = timeRange,
-                        status = statusValue
+                        status = "$teacherName|$subject" // Simpan sementara di status
                     )
 
                     if (id == null) {

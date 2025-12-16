@@ -42,7 +42,10 @@ object Routes {
     // 🔹 ROUTE TAMBAHAN (SCHEDULE)
     const val AddJadwal = "add_jadwal"
     const val EditJadwal = "edit_jadwal/{id}"
+    const val JadwalDetail = "jadwal_detail/{id}" // <-- DITAMBAHKAN KONSTANTA
+
     fun buildEditJadwalRoute(id: Long) = "edit_jadwal/$id"
+    fun buildJadwalDetailRoute(id: Long) = "jadwal_detail/$id" // <-- DITAMBAHKAN BUILDER
 
     fun buildReviewListRoute(id: Int) = "review_list/$id"
     fun buildReviewAddRoute(id: Int) = "review_add/$id"
@@ -171,7 +174,7 @@ fun AppNavigation(
         }
 
         composable(
-            route = "jadwal_detail/{id}",
+            route = Routes.JadwalDetail, // ✅ MENGGUNAKAN KONSTANTA BARU
             arguments = listOf(navArgument("id") { type = NavType.LongType })
         ) {
             val id = it.arguments?.getLong("id")!!
@@ -207,24 +210,6 @@ fun AppNavigation(
         ) {
             val id = it.arguments?.getInt("teacherId") ?: 0
             ReviewListScreen(navController = navController, teacherId = id)
-        }
-
-        composable(Routes.AllReviewsList) {
-            ReviewListScreen(navController = navController, teacherId = null)
-        }
-
-        composable(
-            route = Routes.ReviewAdd,
-            arguments = listOf(navArgument("teacherId") {
-                type = NavType.IntType
-                defaultValue = 0
-            })
-        ) {
-            val id = it.arguments?.getInt("teacherId") ?: 0
-            AddReviewScreen(
-                onBack = { navController.popBackStack() },
-                teacherId = id
-            )
         }
     }
 }

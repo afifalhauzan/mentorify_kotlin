@@ -30,7 +30,17 @@ fun JadwalDetailScreen(
     scheduleId: Long,
     viewModel: ScheduleViewModel = viewModel()
 ) {
-    val schedule = viewModel.getScheduleById(scheduleId)
+    // Ambil data schedules secara reaktif
+    val schedules by viewModel.schedules.collectAsState()
+    val schedule = remember(schedules) {
+        schedules.find { it.id == scheduleId }
+    }
+
+    // Tentukan apakah jadwal bisa dihapus
+    val canBeDeleted = schedule?.let {
+        !listOf("available", "open slot", "confirmed").contains(it.status.lowercase().trim())
+    } ?: false
+
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -87,7 +97,7 @@ fun JadwalDetailScreen(
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = schedule.subject.ifEmpty { "-" },
+                                    text = schedule.teacherSubject.ifEmpty { "-" },
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 12.sp
                                     ),
@@ -153,20 +163,33 @@ fun JadwalDetailScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedButton(
-                    onClick = { showDeleteDialog = true },
+                    onClick = {
+                        if (canBeDeleted) showDeleteDialog = true
+                    },
+                    enabled = canBeDeleted, // Kontrol aktif/non-aktif tombol
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFDC3545)
+                        contentColor = if (canBeDeleted) Color(0xFFDC3545) else Color.Gray
                     ),
-                    border = BorderStroke(1.dp, Color(0xFFDC3545)),
+                    border = BorderStroke(1.dp, if (canBeDeleted) Color(0xFFDC3545) else Color.Gray),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = "Hapus",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(top = 32.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Text(
+                        "Jadwal tidak ditemukan.",
+                        color = Color.Gray
                     )
                 }
             }
@@ -182,6 +205,7 @@ fun JadwalDetailScreen(
                         onClick = {
                             viewModel.deleteSchedule(scheduleId)
                             showDeleteDialog = false
+                            // Navigasi kembali, ViewModel akan me-refresh
                             navController.popBackStack()
                         }
                     ) {

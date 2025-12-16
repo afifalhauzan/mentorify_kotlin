@@ -27,8 +27,35 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                _schedules.value = repository.getSchedules()
+                println("🔵 [ViewModel] Fetching schedules...")
+
+                val rawSchedules = repository.getSchedules()
+                println("🟢 [ViewModel] Fetched ${rawSchedules.size} schedules")
+
+                // ✅ PERBAIKAN: Implementasi parsing untuk mengisi nama/mapel dan status
+                _schedules.value = rawSchedules.map { schedule ->
+                    // Memisahkan string status menjadi [Nama Guru, Mata Pelajaran, Status Aktual]
+                    val parts = schedule.status.split("|").map { it.trim() }
+                    val teacherName = parts.getOrNull(0) ?: ""
+                    val teacherSubject = parts.getOrNull(1) ?: ""
+
+                    // Asumsi: Status sebenarnya ada di bagian ketiga (indeks 2)
+                    val actualStatus = parts.getOrNull(2) ?: ""
+
+                    schedule.copy(
+                        teacherName = teacherName,
+                        teacherSubject = teacherSubject,
+                        // Gunakan status aktual untuk properti 'status', yang dipakai untuk filtering
+                        status = actualStatus.ifEmpty { schedule.status }
+                    )
+                }
+
+                println("📋 [ViewModel] Schedules loaded successfully")
+                _schedules.value.forEach {
+                    println("   - ${it.teacherName} | ${it.teacherSubject} | Status: ${it.status}")
+                }
             } catch (e: Exception) {
+                println("🔴 [ViewModel] Error fetching schedules: ${e.message}")
                 e.printStackTrace()
                 _schedules.value = emptyList()
             } finally {
@@ -41,9 +68,14 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                println("🔵 [ViewModel] Adding schedule: $dto")
+
                 repository.addSchedule(dto)
+                println("🟢 [ViewModel] Schedule added successfully")
+
                 fetchSchedules()
             } catch (e: Exception) {
+                println("🔴 [ViewModel] Error adding schedule: ${e.message}")
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false
@@ -55,9 +87,14 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                println("🔵 [ViewModel] Updating schedule ID: $id")
+
                 repository.updateSchedule(id, dto)
+                println("🟢 [ViewModel] Schedule updated successfully")
+
                 fetchSchedules()
             } catch (e: Exception) {
+                println("🔴 [ViewModel] Error updating schedule: ${e.message}")
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false
@@ -69,9 +106,15 @@ class ScheduleViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                println("🔵 [ViewModel] Deleting schedule ID: $id")
+
                 repository.deleteSchedule(id)
+                println("🟢 [ViewModel] Schedule deleted successfully")
+
+                // Refresh jadwal untuk update UI
                 fetchSchedules()
             } catch (e: Exception) {
+                println("🔴 [ViewModel] Error deleting schedule: ${e.message}")
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false

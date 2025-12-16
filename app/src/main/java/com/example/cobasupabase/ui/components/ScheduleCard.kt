@@ -54,7 +54,7 @@ fun ScheduleCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = schedule.subject.ifEmpty { "-" },
+                        text = schedule.teacherSubject.ifEmpty { "-" },
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 12.sp
                         ),

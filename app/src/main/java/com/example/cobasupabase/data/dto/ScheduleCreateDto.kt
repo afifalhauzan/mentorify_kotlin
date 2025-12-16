@@ -5,12 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ScheduleCreateDto(
-    @SerialName("user_id")
-    val userId: String? = null,
     @SerialName("teacher_id")
-    val teacherId: String? = null,
+    val teacherId: Long? = null,
     val day: String,
     @SerialName("time_range")
     val timeRange: String,
-    val status: String
+    val status: String = "Available"
 )
