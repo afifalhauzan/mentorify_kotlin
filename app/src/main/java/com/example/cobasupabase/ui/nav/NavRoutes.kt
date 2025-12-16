@@ -1,5 +1,8 @@
 package com.example.cobasupabase.ui.nav
 
+import androidx.navigation.NavType
+import com.example.cobasupabase.ui.pages.JadwalDetailScreen
+
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
